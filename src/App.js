@@ -1,23 +1,41 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+import { Input } from 'semantic-ui-react'
+import 'semantic-ui-css/semantic.min.css'
+import Quote from './Quote'
+import Image from './Image'
 import './App.css';
 
+const CAT_QUOTE_URL = "https://cat-fact.herokuapp.com/facts";
+const DEFAULT_TAG = "cute";
+
 function App() {
+  const [quote, setQuote] = useState("")
+  const [tag, setTag] = useState(DEFAULT_TAG)
+
+  useEffect(() => {
+    async function fetchData() {
+      fetch(CAT_QUOTE_URL)
+        .then(response => response.json())
+        .then(data => {
+          setQuote(data[Math.floor(Math.random() * data.length)].text);
+        })
+    }
+    fetchData();
+  }, [])
+
+  const handleInputChange = e => {
+    const value = e.target.value;
+    setTag(value === "" ? DEFAULT_TAG : value);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Image tag={tag}/>
+      <Input
+        placeholder={DEFAULT_TAG}
+        onChange={handleInputChange}
+      />
+      <Quote text={quote}/>
     </div>
   );
 }
